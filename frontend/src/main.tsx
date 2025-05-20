@@ -5,6 +5,7 @@ import './index.css'
 import LandingPage from './LandingPage.tsx'
 import OverViewTextRoom from './mainpage/OverViewTextRoom.tsx';
 import RegisterPage from './login_register/register.tsx';
+import LoginPage from './login_register/login.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -13,6 +14,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path = "/" element={<LandingPage />} />
         <Route path = "/toOverViewTextRoom" element={<OverViewTextRoom />} />
         <Route path = "/register" element={<RegisterPage />} />
+        <Route path = "/login" element={<LoginPage />} />
       </Routes>
     </Router>
   </StrictMode>,

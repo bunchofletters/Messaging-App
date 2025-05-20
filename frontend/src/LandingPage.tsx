@@ -10,7 +10,7 @@ function LandingPage() {
           <img className="w-50 h-50"src='https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IMessage_logo.svg/2048px-IMessage_logo.svg.png' alt="A White Speech Bubble Surround by a Green Background. Also Known as the IMessage Logo"></img>
         </div>
         <div id="side-2">
-          <Link tabIndex={-1} to="/register" className="main-page-button">
+          <Link tabIndex={-1} to="/login" className="main-page-button">
             <button className='justify-center item-center w-full h-full p-2 hover:cursor-pointer focus:font-bold'>Login in</button>
           </Link>
           <Link tabIndex={-1} to="/register" className="main-page-button">

@@ -41,7 +41,6 @@ public class FilterFrontend implements Filter{
                 return;
             } 
 
-        System.out.println("Valid header received: " + frontEndHeader);
 
         chain.doFilter(request, response);
     }

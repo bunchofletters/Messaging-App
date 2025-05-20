@@ -16,6 +16,7 @@ public class user_info {
     private String username;
     private String displayname;
     private String password;
+
     // FIXME: [not a acutally issue using this as an indicator for VSCODE] Use ConstructorProperties or else querying won't work
     @ConstructorProperties({"username", "displayname", "password"})
     public user_info(String username, String displayname, String password
@@ -25,6 +26,8 @@ public class user_info {
         this.displayname = displayname;
         this.password = password;
     }
+
+    public user_info(){}
 
     public String getID(){
         return id;
