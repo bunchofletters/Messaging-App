@@ -4,10 +4,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.realtimemessageapp.CRUD.accountHandling;
 import com.example.realtimemessageapp.database_scheme.user_info;
-import com.example.realtimemessageapp.DTO.userDTO;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +32,7 @@ public class account_service {
         Example:
         {
             username: example,
+            displayname: dot,
             password: com
         }
         */
@@ -44,18 +41,11 @@ public class account_service {
     }
     
     @GetMapping("/user")
-    public ResponseEntity<List<userDTO>> findByUsername(@RequestParam("username") String username){
-        System.out.println("finding user: " + username);
-        List<user_info> users = accountHandler.findByUsername(username);
-
-        if(users.isEmpty())
-            return ResponseEntity.notFound().build();
-        
-
-        List<userDTO> userDTO = users.stream()
-                                .map(user -> new userDTO(user.getID(), user.getUsername()))
-                                .collect(Collectors.toList());
-        return ResponseEntity.ok(userDTO);
+    public ResponseEntity<Void> findByUsername(@RequestParam("username") String username){
+        user_info users = accountHandler.findByUsername(username);
+        if(users == null)
+            return ResponseEntity.notFound().build(); //return a 404 not found | user not found valid
+        return ResponseEntity.ok().build(); //return a 200 ok | user found invalid <--does nothing
     }
     
 }
