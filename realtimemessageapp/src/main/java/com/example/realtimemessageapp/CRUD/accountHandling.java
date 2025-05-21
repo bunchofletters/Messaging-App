@@ -10,4 +10,6 @@ import com.example.realtimemessageapp.database_scheme.user_info;
 @Repository
 public interface accountHandling extends MongoRepository<user_info, String>{
     user_info findByUsername(@Param("username") String username);
+
+    boolean existsByUsernameAndPassword(String username, String password);
 }

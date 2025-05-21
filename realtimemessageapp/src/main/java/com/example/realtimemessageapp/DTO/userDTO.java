@@ -1,20 +1,14 @@
 package com.example.realtimemessageapp.DTO;
 
 public class userDTO {
-    private String id;
     private String username;
+    private String password;
 
-    public userDTO(String id, String username) {
-        this.id = id;
+    public userDTO() {};
+
+    public userDTO(String username, String password) {
+        this.password = password;
         this.username = username;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getUsername() {
@@ -23,5 +17,13 @@ public class userDTO {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword(){
+        return password;
+    }
+
+    public void setPassword(String password){
+        this.password = password;
     }
 }
