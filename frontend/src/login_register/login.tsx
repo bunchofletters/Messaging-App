@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import { useNavigate } from 'react-router';
 
 function LoginPage() {
@@ -9,6 +9,29 @@ function LoginPage() {
     const [password, setPassword] = useState("");
     const [passwordText, setpasswordText] = useState(<>Password</>)
     const [passwordCss, setpasswordCSs] = useState("border-1 w-full rounded-lg focus:ring-blue-500 bg-gray-400 text-black p-2.5 not-dark:focus-visible:bg-white dark:focus-visible:bg-black dark:focus-visible:text-white");
+
+    //Check to see if the user has a valid cookie if they do send them to the mainpage
+    useEffect( () => {
+        async function check_cookie() {
+            try{
+                const response = await fetch("http://localhost:8080/cookie/check_cookie", {
+                    method: "POST",
+                    headers: {
+                        "FE_XP": "react-frontend"
+                    },
+                    credentials: 'include'
+                });
+
+                if(!response.ok)
+                    return;
+
+                navigate('/OverViewTextRoom');
+            } catch (err){
+                console.log(err);
+            }
+        }
+        check_cookie();
+    }, []);
 
 
     async function SignIN(e: React.FormEvent<HTMLFormElement>){
@@ -57,6 +80,7 @@ function LoginPage() {
                     "Content-type": "application/json",
                     "FE_XP": "react-frontend"
                 },
+                credentials: "include",
                 body: JSON.stringify({
                     "username": username,
                     "password": password,

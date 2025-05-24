@@ -12,4 +12,7 @@ public interface accountHandling extends MongoRepository<user_info, String>{
     user_info findByUsername(@Param("username") String username);
 
     boolean existsByUsernameAndPassword(String username, String password);
+
+    @SuppressWarnings("null")
+    boolean existsById(String id);
 }

@@ -127,6 +127,7 @@ function RegisterPage(){
                     "Content-type": "application/json",
                     "FE_XP": "react-frontend"
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     "username": username,
                     "displayname": displayname,
