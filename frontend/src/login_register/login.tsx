@@ -25,7 +25,7 @@ function LoginPage() {
                 if(!response.ok)
                     return;
 
-                navigate('/OverViewTextRoom');
+                navigate('/toOverViewTextRoom');
             } catch (err){
                 console.log(err);
             }

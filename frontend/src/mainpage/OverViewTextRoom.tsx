@@ -1,59 +1,21 @@
 
+import Dropdownbar from "../components/dropdownbar";
 
 function OverViewTextRoom() {
-    const createAccount = () => {
-        const makeTempaccount = async () => {
-            try{
-                const response = await fetch('http://localhost:8080/account/create_account', {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'FE_XP': 'react-frontend', 
-                    },
-                    body: JSON.stringify({
-                        username: "test",
-                        password: "test"
-                    })
-                });
-                const message = await response.text()
-                console.log(message);
-            } catch (err){
-                console.error(err);
-            }
-        }
-        makeTempaccount();
-    }
-    const findAccount = async () =>{
-        try{
-            const response = await fetch('http://localhost:8080/account/user?username=test', {
-                method: "GET",
-                headers: {
-                    'FE_XP': 'react-frontend', 
-                },
-            });
-            if (!response.ok) {
-                throw new Error(`Error: ${response.status} - ${response.statusText}`);
-            }
-            const data = await response.json();
-
-            console.log(data);
-            if (Array.isArray(data) && data.length > 0) {
-                data.forEach(user => {
-                console.log(`User ID: ${user.id}, Username: ${user.username}`);
-                });
-            } else {
-                console.log("No users found");
-            }
-
-        } catch(err){
-            console.error(err);
-        }
-    }
 
     return (
         <>
-            <button onClick={createAccount}>test run</button>
-            <button onClick={findAccount}>test find</button>
+        <Dropdownbar />
+        <div className="flex flex-row w-full h-screen"> {/* split the div row wise*/}
+            <div className="border-1 dark:border-gray-600 flex-1/8 dark:bg-gray-700 not-dark:bg-blue-100 not-dark:border-blue-50"></div>
+            <div className="flex flex-col flex-2/3 dark:bg-gray-800 not-dark:bg-blue-200">
+                <div className="flex-3/4">1</div>
+                <div className="relative flex justify-center">
+                    <input className="border-2 w-[99%] rounded items-center mb-2 p-3 dark:bg-[#242424] not-dark:bg-[#A7C7E7] not-dark:border-[#242424]">
+                    </input>
+                </div>
+            </div>
+        </div>
         </>
     )
 }
