@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter as Router, Routes, Route } from 'react-router';
 import './index.css'
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import LandingPage from './LandingPage.tsx'
 import OverViewTextRoom from './mainpage/OverViewTextRoom.tsx';
 import RegisterPage from './login_register/register.tsx';
