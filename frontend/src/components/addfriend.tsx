@@ -26,8 +26,26 @@ const AddFriendMenu: React.FC<FriendPopUpProps> = ({friendPopUp, closePopUp}) =>
      */
     const FindFriend = async (event: React.FormEvent) => {
         event.preventDefault();
-
-        console.log(friendId);
+            try{
+            const response = await fetch('http://localhost:8080/friend/add_friend', {
+                method: "POST",
+                headers: {
+                    "FE_XP": "react-frontend",
+                    "Content-type": "application/json",
+                },
+                body: JSON.stringify({
+                    "friend_id": friendId
+                }),
+                credentials: 'include'
+            });
+            if (!response.ok){
+                console.log(await response.text());
+                return;
+            }
+            console.log(await response.text());
+        } catch (err){
+            console.error(err);
+        }
     }
 
     return (

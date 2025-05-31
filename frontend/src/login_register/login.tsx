@@ -24,7 +24,7 @@ function LoginPage() {
                     credentials: 'include'
                 });
 
-                if(!response.ok)
+                if(!response.ok || await response.text() == "false")
                     return;
 
                 navigate('/toOverViewTextRoom');
@@ -66,7 +66,7 @@ function LoginPage() {
             setPassword("");
             return
         }
-        navigate('/OverViewTextRoom');
+        navigate('/toOverViewTextRoom');
     }
 
     /**

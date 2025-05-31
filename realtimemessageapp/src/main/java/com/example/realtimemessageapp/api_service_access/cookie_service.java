@@ -33,4 +33,20 @@ public class cookie_service {
         }
         return false;
     }
+
+    public String getId(HttpServletRequest request){
+        Cookie[] cookies = request.getCookies();
+        boolean exist = false;
+        String CookieValue = null;
+        for (Cookie cookie : cookies){
+            if("id".equals(cookie.getName())){
+                exist = accountHandler.existsById(cookie.getValue());
+            }
+            if (exist){
+                CookieValue = cookie.getValue();
+                break;
+            }
+        }
+        return CookieValue;
+    }
 }

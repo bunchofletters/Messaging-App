@@ -33,6 +33,10 @@ public class user_info {
         return id;
     }
 
+    public void setID(String id){
+        this.id = id;
+    }
+
     public String getDsiplayName(){
         return displayname;
     }

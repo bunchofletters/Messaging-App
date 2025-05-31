@@ -55,6 +55,7 @@ public class account_service {
         cookie.setHttpOnly(true); //prevent modification clientside
         cookie.setSecure(false); //allow over http
         cookie.setMaxAge(60 * 60 * 24 * 3); //seconds * minutes * hours * days
+        cookie.setPath("/");
         response.addCookie(cookie);
         return "New Account Created with ID: " + saveuser.getID();
     }
@@ -85,6 +86,7 @@ public class account_service {
         cookie.setHttpOnly(true); //prevent modification clientside
         cookie.setSecure(false); //allow over http
         cookie.setMaxAge(60 * 60 * 24 * 3); //seconds * minutes * hours * days
+        cookie.setPath("/");
         response.addCookie(cookie);
         return ResponseEntity.ok().build();
     }

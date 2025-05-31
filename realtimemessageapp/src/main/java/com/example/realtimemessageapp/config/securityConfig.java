@@ -21,7 +21,7 @@ public class securityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors ->{})
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/account/**", "/cookie/**").permitAll()
+                .requestMatchers("/account/**", "/cookie/**", "/friend/**").permitAll()
                 .anyRequest().authenticated()
             ).build();
     }
