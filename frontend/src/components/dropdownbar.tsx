@@ -1,9 +1,14 @@
 import {useState} from 'react'
+import AddFriendMenu from './addfriend';
 
 export default function Dropdownbar(){
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenSymbol, setisOpenSymbol] = useState(<>&#8744;</>)
+    const [friendMenu, setFriendMenu] = useState(false);
 
+    /**
+     * This is the function that handles opening and closing the dropdown menu
+     */
     const toggle = () => {
         setIsOpen(!isOpen); //if it's open close it and vice versa
         if(isOpen) //open
@@ -13,13 +18,31 @@ export default function Dropdownbar(){
             setisOpenSymbol(<>&#8743;</>);
     }
 
+    //TODO
+    /**
+     * Remove the cookies and send them back to the landing page
+     */
     async function signOut(){
         console.log("signout click");
     }
 
-    async function addFriend(){
-        console.log("add friend click");
+    /**
+     * Set addFriendMenu to true which allows the addfriend.tsx to be displayed 
+     * @see {@link AddFriendMenu}
+     */
+    const addFriend = () => {
+        setFriendMenu(true);
     }
+
+    /**
+     * Set addFriendMenu to false which hides addfriend.tsx
+     * @see {@link AddFriendMenu}
+     */
+    const closePopUp = () => {
+        setFriendMenu(false);
+    }
+
+
 
     return (
         <>
@@ -38,8 +61,15 @@ export default function Dropdownbar(){
                 onClick={addFriend}
                 tabIndex={0}
                 style={{padding: '1rem 0.25rem 0 0.25rem'}}>
-                    <i className="fa-solid fa-circle-user dark:text-white fa-2x -mt-3"></i>
+                    <i className="fa-solid fa-user-group dark:text-white fa-2x -mt-3"></i>
                     <p className='dark: text-white'>Add Friends</p>
+                </div>
+                <div className='flex flex-col justify-center items-center border border-transparent hover:border-white hover:rounded -mt-3'
+                onClick={addFriend}
+                tabIndex={0}
+                style={{padding: '1rem 0.25rem 0 0.25rem'}}>
+                    <i className="fa-solid fa-circle-user dark:text-white fa-2x -mt-3"></i>
+                    <p className='dark: text-white'>Profile</p>
                 </div>
             </div>
         </div>
@@ -48,6 +78,8 @@ export default function Dropdownbar(){
                 className="inline-flex justify-center items-center w-10 bg-blue-500 text-white rounded-b-lg hover:bg-blue-600"
             ><span className=''>{isOpenSymbol}</span></button>
         </div>
+        {/*friend pop up menu */}
+        <AddFriendMenu friendPopUp={friendMenu} closePopUp={closePopUp} />
         </>
     )
 }

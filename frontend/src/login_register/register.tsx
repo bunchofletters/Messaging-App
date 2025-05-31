@@ -24,12 +24,20 @@ function RegisterPage(){
 
     const [createDisable, setcreateDisable] = useState(false); 
 
-    //create a debounce instance to prevent querying the db too many times
+    /**
+     * create a debounce instance to prevent querying the db too many times
+     * current time delay is set to 1000 millisecond or 1 second
+     */
     const debounceCheckUsername = useCallback(
         debounce(() => {
             checkUsernameAvability();
         }, 1000), []);
 
+    /**
+     * @param username passed in as part of the fetch in the param called username
+     * @param usernameCss css change if username is already taken
+     * check if a username is in the DB or not
+     */
     async function checkUsernameAvability(){
         if (usernameRef.current === ""){
             return;
@@ -55,7 +63,14 @@ function RegisterPage(){
             console.error(err);
         }
     }
-    //check if the user password is valid realtime
+    /**
+     * check if the user password is valid realtime
+     * check 1: string length
+     * check 2: special symbol
+     * check 3: number check
+     * check 4: Lower and Upper case check
+     * @param p the password
+     */
     function validatePassword(p: string){
         //regex1 -> check string length
         const lengthRegex = /^(?=.{5,20}$)/
@@ -83,6 +98,13 @@ function RegisterPage(){
             setPasswordReq4(<>Has a Uppercase and Lowercase Letter <span className="text-sm text-green-500" aria-label='Requirement Met'>&#10003;</span></>)
     }
 
+    /**
+     * create an accoutn if it passes the regex check
+     * @see {@link createAccount} the actual function creating the account
+     * 
+     * @param usernameCss update css if invalid
+     * @param passwordCSS update css if invalid
+     */
     function makeAccount(){
         let returnEarly = false;
         //check 1-> check if password meets requirement
@@ -118,6 +140,12 @@ function RegisterPage(){
             setUsernameCss("border-1 w-full rounded-lg border-red-500 focus:ring-blue-500 bg-gray-400 text-black p-2.5 not-dark:focus-visible:bg-white dark:focus-visible:bg-black dark:focus-visible:text-white");
         }
     }
+
+    /**
+     * @param username pass in the body of the fetch
+     * @param displayname pass in the body of the fetch
+     * @param password pass in the body of the fetch
+     */
     const createAccount = async () => {
         try{
             console.log({username,displayname, password});

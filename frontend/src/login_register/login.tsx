@@ -10,7 +10,9 @@ function LoginPage() {
     const [passwordText, setpasswordText] = useState(<>Password</>)
     const [passwordCss, setpasswordCSs] = useState("border-1 w-full rounded-lg focus:ring-blue-500 bg-gray-400 text-black p-2.5 not-dark:focus-visible:bg-white dark:focus-visible:bg-black dark:focus-visible:text-white");
 
-    //Check to see if the user has a valid cookie if they do send them to the mainpage
+    /**
+     * Check to see if the user has a valid cookie if they do send them to the mainpage
+     */
     useEffect( () => {
         async function check_cookie() {
             try{
@@ -34,6 +36,17 @@ function LoginPage() {
     }, []);
 
 
+    /**
+     * 
+     * @param e Prevent reloading
+     * @param username
+     * @param usernameCss this will be change on error
+     * @param usernameTextthis will be change on error
+     * @param passwordCss this will be change on error
+     * @param passwordText this will be change on error
+     * 
+     * @returns check to see if the credientals exist in the DB if they do send the user to the main page else change the CSS to show an issue with login informatoin
+     */
     async function SignIN(e: React.FormEvent<HTMLFormElement>){
         e.preventDefault();
         //check if username exist
@@ -56,6 +69,10 @@ function LoginPage() {
         navigate('/OverViewTextRoom');
     }
 
+    /**
+     * @param username pass in as part of the fetch request param named username
+     * Checking if the username exist in the DB
+     */
     async function CheckUsername(){
         try{
             const response = await fetch(`http://localhost:8080/account/user?username=${username}`, {
@@ -72,6 +89,12 @@ function LoginPage() {
         }
     }
 
+    /**
+     * @param username pass in on the body fetch request
+     * @param password pass in on the body fetch request
+     * 
+     * Checking if the password matches the user with the username
+     */
     async function checkPassword(){
         try{
             const response = await fetch('http://localhost:8080/account/login', {
