@@ -44,7 +44,7 @@ function OverViewTextRoom() {
                     <div 
                         className={`transition-all duration-1000 ease-in-out dark:bg-gray-900 not-dark:bg-[#bdd8f3] ${friendRequest ? 'h-full': 'h-0'}`}
                     >
-                        <FriendRequest/>
+                        <FriendRequest key={Date.now()}/>
                     </div>
                 </div>
             </div>
