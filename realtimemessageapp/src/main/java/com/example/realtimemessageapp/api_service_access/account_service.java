@@ -35,17 +35,20 @@ public class account_service {
     // public account_service(accountHandling accountHandler){
     //     this.accountHandler = accountHandler;
     // }
-    
+    /**
+     * Creates an acccount for an user
+     * @param entity 
+     * {
+     *  username: example,
+     *  displayname: dot,
+     *  password: com
+     * }
+     * @param response this is to store cookies
+     * @return probably don't need to reutrn anything, for now a result of the created user id
+     * change to just a confimration message or ok in the future and not ok on failure
+     */
     @PostMapping("/create_account")
     public String postMethodName(@RequestBody user_info entity, HttpServletResponse response) {
-        /*entity should contain and password
-        Example:
-        {
-            username: example,
-            displayname: dot,
-            password: com
-        }
-        */
         System.out.println("creating Account " + entity.getPassword());
         String encryptedPassword = passwordEncoder.encode(entity.getPassword());
         entity.setPassword(encryptedPassword);
@@ -60,6 +63,11 @@ public class account_service {
         return "New Account Created with ID: " + saveuser.getID();
     }
     
+    /**
+     * Checks if the user exist alread in the DB
+     * @param username ?username should be included in the url header. querying for the value set in username
+     * @return 404 not found on failure and 200 ok on success
+     */
     @GetMapping("/user")
     public ResponseEntity<Void> findByUsername(@RequestParam("username") String username){
         user_info user = accountHandler.findByUsername(username);
@@ -68,6 +76,13 @@ public class account_service {
         return ResponseEntity.ok().build(); //return a 200 ok | user found invalid <--does nothing
     }
 
+    /**
+     * Login in mapping, check if the user is in the db and the password match if it does
+     * set the cookie with the id of the user
+     * @param entity should contain a username and password
+     * @param response for storing cookies
+     * @return 404 not found on failure and 200 ok on success
+     */
     @PostMapping("/login")
     public ResponseEntity<Void> loginIn(@RequestBody userDTO entity, HttpServletResponse response) {
         System.out.println(entity.getUsername() + " " + entity.getPassword());

@@ -17,6 +17,11 @@ public class cookie_service {
     @Autowired
     private accountHandling accountHandler;
 
+    /**
+     * Check if a cookie exist
+     * @param request credientials to be able to check for the associated cookies
+     * @return false if cookie not found or true if found
+     */
     @PostMapping("/check_cookie")
     public boolean confirmCookie(HttpServletRequest request){
         Cookie[] cookies = request.getCookies();
@@ -34,6 +39,11 @@ public class cookie_service {
         return false;
     }
 
+    /**
+     * Query for the string value in the cookie and return it: in this case it should be the user's id 
+     * @param request credientials to be able to check for the associated cookies
+     * @return the users id store in the cookie on account creation or login
+     */
     public String getId(HttpServletRequest request){
         Cookie[] cookies = request.getCookies();
         boolean exist = false;

@@ -2,16 +2,23 @@
 export interface FriendBox {
     displayName: string,
     classType: String
+    friendId: string,
 }
 
-const Friendbox: React.FC<FriendBox> = ({displayName, classType}) => {
+const Friendbox: React.FC<FriendBox> = ({displayName, classType, friendId}) => {
 
+    /**
+     * This will remove and decline the friend request
+     */
     async function decline_remove(){
-        console.log("decline_remove clicked");
+        console.log("decline_remove clicked " + friendId);
     }
 
+    /**
+     * this will remove and add the friend
+     */
     async function accept(){
-        console.log("accept clicked");
+        console.log("accept clicked " + friendId);
     }
 
     return (
