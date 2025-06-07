@@ -1,8 +1,6 @@
 package com.example.realtimemessageapp.api_service_access;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.bson.types.ObjectId;
@@ -16,13 +14,14 @@ import com.example.realtimemessageapp.CRUD.friendHandling;
 import com.example.realtimemessageapp.CRUD.friendRelationHandling;
 import com.example.realtimemessageapp.DTO.friendRequestDTO;
 import com.example.realtimemessageapp.database_scheme.friend_info;
+import com.example.realtimemessageapp.database_scheme.friend_relation;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 
@@ -47,6 +46,7 @@ public class friend_service {
      * @param friendInfo the id of the friend as a string
      * @param response for cookie which has the user's id
      * @return 400 bad request if a issue arises or 200 ok on success
+     * calls {@link #addFriend}
      */
     @PostMapping("/add_friend")
     public ResponseEntity<String> makeFriendRequest(
@@ -54,7 +54,7 @@ public class friend_service {
         HttpServletRequest response
     ){
         String id = c_s.getId(response);
-        boolean result = addFriend(new ObjectId(id), friendInfo.getFriendId()); //expecting the body to have "Friend_id" 
+        boolean result = addFriend(new ObjectId(id), friendInfo.getFriendId()); //expecting the body to have "Friend_id"
         if (!result)
             return ResponseEntity.badRequest().body("You may already be friends with them");
         return ResponseEntity.status(200).body("Friend Added");
@@ -74,7 +74,7 @@ public class friend_service {
             return ResponseEntity.notFound().build();
 
         List<friendRequestDTO> friendDTO = query_list.stream()
-            .map(info -> new friendRequestDTO(info.getFriendId(), accountHander.findById(info.getFriendId()).getDsiplayName()))
+            .map(info -> new friendRequestDTO(info.getFriendId().toHexString(), accountHander.findById(info.getFriendId()).getDsiplayName()))
             .collect(Collectors.toList());
         
         return ResponseEntity.ok(friendDTO);
@@ -94,7 +94,7 @@ public class friend_service {
             return ResponseEntity.notFound().build();
         
         List<friendRequestDTO> friendDTO = query_list.stream()
-            .map(info -> new friendRequestDTO(info.getUserId(), accountHander.findById(info.getUserId()).getDsiplayName()))
+            .map(info -> new friendRequestDTO(info.getUserId().toHexString(), accountHander.findById(info.getUserId()).getDsiplayName()))
             .collect(Collectors.toList());
         
         return ResponseEntity.ok(friendDTO);
@@ -108,6 +108,10 @@ public class friend_service {
      * @return
      */
     private boolean addFriend(ObjectId id_1, ObjectId id_2){
+        //check if id_1 == id_2 and return if they are
+        if (id_1 == id_2) // can't friend yourself : we can have this as a default relationship if we want
+            return false;
+
         boolean exist = friendHandler.existsByUserIdAndFriendId(id_1, id_2);
         if (exist) //do not add this pair
             return false;
@@ -127,6 +131,75 @@ public class friend_service {
             return false;
         }
         return true; //pair added
+    }
+
+    /**
+     * Create a entry in the friend_relation table and delete the request entry in the friend_info table
+     * @param friendRelation the friendDTO object that is set by the body of the fetch
+     * @param request for user id
+     * @return
+     */
+    @PutMapping("/handle")
+    public ResponseEntity<Void> friendRequestHandle(
+        @RequestBody friendRequestDTO friendRelation,
+        HttpServletRequest request
+    ){
+        String id = c_s.getId(request); //id of the user
+        String compareObj = friendRelation.getFriendId();
+        ObjectId smallerId = null;
+        ObjectId biggerId = null;
+        int compare = id.compareTo(compareObj);
+        if (compare < 0) { //user id is smaller
+            smallerId = new ObjectId(id);
+            biggerId = new ObjectId(friendRelation.getFriendId());
+        }
+        else if(compare > 0){ //user id is bigger
+            biggerId  = new ObjectId(id);
+            smallerId = new ObjectId(friendRelation.getFriendId()); 
+        }
+        else{ //if somehow the two id are the same
+            return ResponseEntity.badRequest().build();
+        }
+
+        friend_relation fr = new friend_relation(smallerId, biggerId, friendRelation.getdisplayName());
+
+        try{
+            relationshiphandler.save(fr);
+            friendHandler.deleteByUserIdAndFriendId(smallerId, biggerId);
+            friendHandler.deleteByUserIdAndFriendId(biggerId, smallerId);
+        } catch (Exception e){
+            System.out.println(e);
+            return ResponseEntity.status(500).build();
+        }
+
+        
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * delete the entry in the friend_info table for friend request
+     * @implNote untested api endpoint
+     * @param request for user id
+     * @param friendRelation the friendDTO object that is set by the body of the fetch
+     * @return
+     */
+    @DeleteMapping("/handle")
+    public ResponseEntity<Void> friendRequestHandle(
+        HttpServletRequest request,
+        @RequestBody friendRequestDTO friendRelation
+    ){
+        ObjectId id = new ObjectId(c_s.getId(request));
+        ObjectId friend = new ObjectId(friendRelation.getFriendId());
+
+        try{
+            friendHandler.deleteByUserIdAndFriendId(id, friend);
+            friendHandler.deleteByUserIdAndFriendId(friend, id);
+        } catch(Exception e){
+            System.out.println(e);
+            return ResponseEntity.status(500).build();
+        }
+
+        return ResponseEntity.ok().build();
     }
     
 }

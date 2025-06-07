@@ -15,4 +15,6 @@ public interface friendHandling extends MongoRepository<friend_info, String>{
     List<friend_info> findByUserId(ObjectId userId);
 
     List<friend_info> findByFriendId(ObjectId friendId);
+
+    void deleteByUserIdAndFriendId(ObjectId userId, ObjectId friendId);
 }

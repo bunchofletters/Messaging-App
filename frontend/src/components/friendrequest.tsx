@@ -6,6 +6,13 @@ import type { FriendBox } from "./friendbox";
 function FriendRequest(){
     const [outgoingRequest, setOutGoingRequest] = useState<FriendBox[]>([])
     const [incomingRequest, setIncomingRequest] = useState<FriendBox[]>([])
+    
+    const [reloadFlag, setReloadFlag] = useState(false);
+
+
+    const componentReload = () => {
+        setReloadFlag(prev => !prev);
+    }
 
     useEffect(() => {
         const fetchFriendRequest = async () => {
@@ -26,7 +33,8 @@ function FriendRequest(){
             let outgoingList: FriendBox[] = result.map(friendInfo => ({
                 displayName: friendInfo.displayName,
                 classType: "0",
-                friendId: friendInfo.friendId
+                friendId: friendInfo.friendId,
+                reloadFunc: componentReload
             }));
 
             setOutGoingRequest(outgoingList);
@@ -51,7 +59,8 @@ function FriendRequest(){
             let incomingList = result.map(friendInfo => ({
                 displayName: friendInfo.displayName,
                 classType: "1",
-                friendId: friendInfo.friendId
+                friendId: friendInfo.friendId,
+                reloadFunc: componentReload
             }));
 
             setIncomingRequest(incomingList);
@@ -60,7 +69,7 @@ function FriendRequest(){
         fetchFriendRequest();
         fetchFriendRequest2();
 
-    }, []);
+    }, [reloadFlag]);
 
     return  (
         <div className="flex flex-col">
@@ -73,7 +82,9 @@ function FriendRequest(){
                         key={item.friendId}
                         displayName={item.displayName} 
                         classType={item.classType}
-                        friendId={item.friendId}/>
+                        friendId={item.friendId}
+                        reloadFunc={item.reloadFunc}
+                        />
                     ))}
                 </div>
                 {/* generate a list of outgoing request */}
@@ -88,7 +99,9 @@ function FriendRequest(){
                         key={item.friendId}
                         displayName={item.displayName} 
                         classType={item.classType}
-                        friendId={item.friendId}/>
+                        friendId={item.friendId}
+                        reloadFunc={item.reloadFunc}
+                        />
                     ))}
                 </div>
             </div>

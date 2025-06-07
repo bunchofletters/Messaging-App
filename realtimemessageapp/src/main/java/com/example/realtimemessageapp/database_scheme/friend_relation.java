@@ -17,6 +17,12 @@ public class friend_relation {
 
     public friend_relation(){}
 
+    public friend_relation(ObjectId userid, ObjectId friendid, String friendisplayname){
+        this.userId = userid;
+        this.friendId = friendid;
+        this.friendDisplayName = friendisplayname;
+    }
+
     public ObjectId getUserId() {
         return userId;
     }

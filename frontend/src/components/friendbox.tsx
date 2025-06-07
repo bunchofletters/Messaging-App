@@ -3,22 +3,52 @@ export interface FriendBox {
     displayName: string,
     classType: String
     friendId: string,
+    reloadFunc: () => void,
 }
 
-const Friendbox: React.FC<FriendBox> = ({displayName, classType, friendId}) => {
+const Friendbox: React.FC<FriendBox> = ({displayName, classType, friendId, reloadFunc}) => {
 
     /**
      * This will remove and decline the friend request
      */
     async function decline_remove(){
-        console.log("decline_remove clicked " + friendId);
+        const response = await fetch('http://localhost:8080/friend/handle', {
+            method: "DELETE",
+            headers: {
+                "FE_XP": "react-frontend",
+                "Content-Type": "application/json"
+            },
+            credentials: "include"
+        });
+
+        if (!response.ok)
+            console.error("Issue removing friend request");
+        reloadFunc();
+        return;
     }
 
     /**
      * this will remove and add the friend
      */
     async function accept(){
-        console.log("accept clicked " + friendId);
+        const response = await fetch('http://localhost:8080/friend/handle', {
+            method: "PUT",
+            headers:{
+                "FE_XP": "react-frontend",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "FriendId": friendId,
+                "displayName": displayName
+            }),
+            credentials: 'include'
+        });
+
+        if(!response.ok)
+            console.error("error adding friend");
+
+        reloadFunc();
+        return;
     }
 
     return (

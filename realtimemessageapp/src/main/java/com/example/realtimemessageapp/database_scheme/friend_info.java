@@ -1,7 +1,5 @@
 package com.example.realtimemessageapp.database_scheme;
 
-import java.beans.ConstructorProperties;
-
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
