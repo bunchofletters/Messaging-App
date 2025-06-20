@@ -1,4 +1,4 @@
-package com.example.realtimemessageapp.filter;
+package com.example.realtimemessageapp.otherclasses;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -10,6 +10,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class FilterFrontend implements Filter{
     
@@ -34,12 +35,27 @@ public class FilterFrontend implements Filter{
                 return;
             }
 
+            //skip WebSocket prevent filter from blocking websocket connection
+            if("websocket".equalsIgnoreCase(req.getHeader("Upgrade"))) { //websocket will reqeust to upgrade http connection to a websocket connection
+                chain.doFilter(request, response);
+                return;
+            }
+
+            //Prevents request that doesn't have the require header. Good for Authorization
             String frontEndHeader = req.getHeader(REQUIRE_HEADER);
             if (frontEndHeader == null || !frontEndHeader.equals(HEADER_VALUE)) {
                 res.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                res.getWriter().write("Forbidden: Invalid Access");
+                res.getWriter().write("Blocked By Filter: Missing Required Header");
                 return;
             } 
+
+            String decodeurl = java.net.URLDecoder.decode(req.getRequestURL().toString(), StandardCharsets.UTF_8); //decode the url to only utf-8 characters [unencode the url if it was being encoded]
+
+            //Prevent Traversal Attack. Good for Security
+            if(decodeurl.contains("../")) {
+                res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                res.getWriter().write("Blocked By Filter: Potential Traversal Attack");
+            }
 
 
         chain.doFilter(request, response);

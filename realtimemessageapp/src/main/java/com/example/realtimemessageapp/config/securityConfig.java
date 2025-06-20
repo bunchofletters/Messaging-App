@@ -21,9 +21,18 @@ public class securityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors ->{})
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/account/**", "/cookie/**", "/friend/**").permitAll()
+                .requestMatchers("/account/**", "/cookie/**", "/friend/**", "ws/**").permitAll()
                 .anyRequest().authenticated()
             ).build();
     }
+
+    //disable security filter allows for testing to see if security is blocking request
+    // @Bean
+    // public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    // return http
+    //     .csrf(csrf -> csrf.disable())
+    //     .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()).build();
+            
+    // }
     
 }
