@@ -2,6 +2,7 @@ import {useState} from 'react'
 import Dropdownbar from "../components/dropdownbar";
 import FriendRequest from "../components/friendrequest";
 import LeftMessageBox from '../components/leftMessagePanel';
+import RightMessageBox from '../components/messageBoxImport';
 
 function OverViewTextRoom() {
     const [friendRequest, setFriendRequest] = useState(false);
@@ -79,7 +80,11 @@ function OverViewTextRoom() {
                 </div>
             </div>
             <div className="flex flex-col flex-2/3 dark:bg-gray-800 not-dark:bg-blue-200">
-                <div className="flex-3/4">1</div>
+                <div className="flex-3/4">
+                    <div className= "mt-5 ml-2">
+                        <RightMessageBox />
+                    </div>
+                </div>
                 <div className="relative flex justify-center">
                     <input className="border-2 w-[99%] rounded items-center mb-2 p-3 dark:bg-[#242424] not-dark:bg-[#A7C7E7] not-dark:border-[#242424]">
                     </input>
