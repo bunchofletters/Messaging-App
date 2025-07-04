@@ -9,8 +9,14 @@ export interface MessageContent {
 const MessageBox: React.FC<MessageContent> = ({displayName, content, side}) => {
     return(
         <>
-        <p>{displayName}</p>
-        <p>{content}</p>
+        <div>
+            <div>  {/*display name div */}
+                <p>{displayName}</p>
+            </div>
+            <div> {/*message content div */}
+                <p>{content}</p>
+            </div>
+        </div>
         </>
     )
 };

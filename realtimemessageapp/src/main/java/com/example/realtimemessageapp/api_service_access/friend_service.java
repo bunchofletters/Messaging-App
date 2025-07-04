@@ -15,6 +15,7 @@ import com.example.realtimemessageapp.CRUD.friendRelationHandling;
 import com.example.realtimemessageapp.DTO.friendRequestDTO;
 import com.example.realtimemessageapp.database_scheme.friend_info;
 import com.example.realtimemessageapp.database_scheme.friend_relation;
+import com.example.realtimemessageapp.database_scheme.user_info;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -200,6 +201,39 @@ public class friend_service {
         }
 
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Get the friend list of a user given their id
+     * @param request for cookies to get userid
+     * @return either 500 error or 200 ok with the friend list
+     */
+    @PostMapping("/getFriend")
+    public ResponseEntity<List<friendRequestDTO>> getFriends(
+        HttpServletRequest request
+    ){
+        String id = c_s.getId(request); //id of the user
+        try{
+            List<friend_relation> data = relationshiphandler.findByFriendIdOrUserId(new ObjectId(id), new ObjectId(id));
+            List<friendRequestDTO> friendRelation = data.stream()
+                .map(info -> {
+                    String first = info.getUserId().toString();
+                    String second = info.getFriendId().toString();
+
+                    //if the first is the user id we do not need to do a look up. if the second is we do need a look up
+                    if (first == id){
+                        return new friendRequestDTO(second, info.getFriendDisplayName());
+                    }
+                    else{
+                        user_info friend_info = accountHander.findById(new ObjectId(first));
+                        return new friendRequestDTO(first, friend_info.getDsiplayName());
+                    }
+                }).collect(Collectors.toList());
+            
+            return ResponseEntity.ok(friendRelation);
+        } catch(Exception e){
+            return ResponseEntity.status(500).build();
+        }
     }
     
 }

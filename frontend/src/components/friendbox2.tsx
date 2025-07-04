@@ -2,10 +2,10 @@
 
 export interface FriendBox2 {
     displayName: string,
-    friendId: string,
+    FriendId: string,
 }
 
-const Friendbox2: React.FC<FriendBox2> = ({displayName, friendId}) => {
+const Friendbox2: React.FC<FriendBox2> = ({displayName, FriendId}) => {
     
     
     return (

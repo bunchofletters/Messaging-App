@@ -6,7 +6,7 @@ import RightMessageBox from '../components/messageBoxImport';
 
 function OverViewTextRoom() {
     const [friendRequest, setFriendRequest] = useState(false);
-    const [message, setMessage] = useState(false);
+    const [message, setMessage] = useState(true);
 
     const [overflow, setOverFlow] = useState('auto')
 
