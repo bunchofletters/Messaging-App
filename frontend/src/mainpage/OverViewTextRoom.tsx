@@ -1,14 +1,21 @@
-import {useState} from 'react'
+import {useState, useRef, useEffect} from 'react'
 import Dropdownbar from "../components/dropdownbar";
 import FriendRequest from "../components/friendrequest";
 import LeftMessageBox from '../components/leftMessagePanel';
 import RightMessageBox from '../components/messageBoxImport';
+import type { MessageContent } from '../components/messagebox';
+import {Client} from '@stomp/stompjs';
+
 
 function OverViewTextRoom() {
     const [friendRequest, setFriendRequest] = useState(false);
     const [message, setMessage] = useState(true);
 
     const [overflow, setOverFlow] = useState('auto')
+
+    useEffect(() => {
+        websocketSetup();
+    }, [])
 
     
     // const [zIndex, setzIndex] = useState(-1);
@@ -30,6 +37,63 @@ function OverViewTextRoom() {
                 break;
         }
     }
+
+    // web socket suff
+    const stompclient = useRef<Client | null>(null);
+    const currentroom = useRef<any>(null);
+    const [roomMessage, setRoomMessage] = useState<Map<string, MessageContent[]>>(new Map());
+    const [messToSend, setMessToSend] = useState('');
+
+
+    const [roomId, setRoomId] = useState('')
+
+    const websocketSetup = () => {
+        stompclient.current = new Client({
+            brokerURL: 'ws://localhost:8080/ws/chat',
+            connectHeaders: {},
+            debug: function(str){
+                console.log(str);
+            },
+            onConnect: (frame) =>{
+                console.log("connected: ", frame);
+            },
+        });
+
+        stompclient.current.activate();
+    }
+
+    const switchRoom = (roomId: string) => {
+        if(currentroom.current){
+            currentroom.current.unsubscribe();
+            console.log("unsubscribing from room");
+        }
+
+        currentroom.current = stompclient.current?.subscribe(`/chat/${roomId}`, (messageOutput: any) => {
+            const incomingMessage = messageOutput.body;
+            setRoomMessage((prevroomMessage) => {
+                const rM = new Map(prevroomMessage); //create a copy of the map
+                const prevMess = rM.get(roomId) || []; // get the content related to teh room
+                rM.set(roomId, [...prevMess, incomingMessage]); //copy old and add new
+
+                return rM; //return the updated map
+            });
+            console.log("updating message");
+        })
+
+        setRoomId(roomId);
+    }
+
+    const sendMessage = () => {
+        if(messToSend && roomId && stompclient.current?.connected) {
+            stompclient.current?.publish({
+                destination: `/chat/send`,
+                body: JSON.stringify({roomId, messToSend})
+            });
+            setMessToSend('');
+        }
+    };
+
+// end of web socket stuff
 
     return (
         <>
@@ -82,7 +146,7 @@ function OverViewTextRoom() {
             <div className="flex flex-col flex-2/3 dark:bg-gray-800 not-dark:bg-blue-200">
                 <div className="flex-3/4">
                     <div className= "mt-5 ml-2">
-                        <RightMessageBox />
+                        <RightMessageBox messages={roomMessage.get(roomId) || []}/>
                     </div>
                 </div>
                 <div className="relative flex justify-center">

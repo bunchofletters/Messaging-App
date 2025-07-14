@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.realtimemessageapp.CRUD.accountHandling;
+import com.example.realtimemessageapp.CRUD.chatServerHandling;
 import com.example.realtimemessageapp.CRUD.friendHandling;
 import com.example.realtimemessageapp.CRUD.friendRelationHandling;
 import com.example.realtimemessageapp.DTO.friendRequestDTO;
+import com.example.realtimemessageapp.database_scheme.friendChatServer;
 import com.example.realtimemessageapp.database_scheme.friend_info;
 import com.example.realtimemessageapp.database_scheme.friend_relation;
 import com.example.realtimemessageapp.database_scheme.user_info;
@@ -40,7 +42,11 @@ public class friend_service {
     private friendRelationHandling relationshiphandler; //this is for the actually friend relationship when a request is accepted
 
     @Autowired
+    private chatServerHandling chatserverhandler; //creating a server id between two people
+
+    @Autowired
     private cookie_service c_s;
+
 
     /**
      * Create a friend request between two users
@@ -168,6 +174,9 @@ public class friend_service {
             relationshiphandler.save(fr);
             friendHandler.deleteByUserIdAndFriendId(smallerId, biggerId);
             friendHandler.deleteByUserIdAndFriendId(biggerId, smallerId);
+
+            friendChatServer fcs = new friendChatServer(smallerId, biggerId);
+            chatserverhandler.save(fcs);
         } catch (Exception e){
             System.out.println(e);
             return ResponseEntity.status(500).build();
