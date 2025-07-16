@@ -5,6 +5,7 @@ import LeftMessageBox from '../components/leftMessagePanel';
 import RightMessageBox from '../components/messageBoxImport';
 import type { MessageContent } from '../components/messagebox';
 import {Client} from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
 
 function OverViewTextRoom() {
@@ -49,14 +50,14 @@ function OverViewTextRoom() {
 
     const websocketSetup = () => {
         stompclient.current = new Client({
-            brokerURL: 'ws://localhost:8080/ws/chat',
+            webSocketFactory: () => new SockJS('http://localhost:8080/ws/chat'),
             connectHeaders: {},
-            debug: function(str){
-                console.log(str);
-            },
-            onConnect: (frame) =>{
-                console.log("connected: ", frame);
-            },
+            // debug: function(str){
+            //     console.log(str);
+            // },
+            // onConnect: (frame) =>{
+            //     console.log("connected: ", frame);
+            // },
         });
 
         stompclient.current.activate();
@@ -139,7 +140,7 @@ function OverViewTextRoom() {
                         onTransitionStart={()=>setOverFlow('hidden')}
                         onTransitionEnd={()=>setOverFlow('auto')}
                     >
-                        <LeftMessageBox />
+                        <LeftMessageBox setRoomId={switchRoom}/>
                     </div>
                 </div>
             </div>

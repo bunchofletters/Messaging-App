@@ -2,7 +2,11 @@ import { useEffect, useState } from "react"
 import Friendbox2 from "./friendbox2"
 import type { FriendBox2 } from "./friendbox2"
 
-export default function LeftMessageBox() {
+interface roomProp {
+    setRoomId: (roomId: string) => void
+}
+
+const LeftMessageBox: React.FC<roomProp> = ({setRoomId}) => {
 
     const [friendList, updateFriendList] = useState<FriendBox2[]>([]);
 
@@ -26,6 +30,7 @@ export default function LeftMessageBox() {
                 friendInfo => ({
                     FriendId: friendInfo.FriendId,
                     displayName: friendInfo.displayName,
+                    roomId: friendInfo.roomId,
                 })
             )
             updateFriendList(fl);
@@ -36,8 +41,10 @@ export default function LeftMessageBox() {
     return(
         <>
         {friendList.map(friend => (
-            <Friendbox2 displayName={friend.displayName} FriendId={friend.FriendId} />
+            <Friendbox2 displayName={friend.displayName} FriendId={friend.FriendId} roomId={friend.roomId} setRoomId={setRoomId} />
         ))}
         </>
     )
 };
+
+export default LeftMessageBox

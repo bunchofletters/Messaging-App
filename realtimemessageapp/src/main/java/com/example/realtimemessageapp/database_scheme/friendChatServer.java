@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class friendChatServer {
     
     @Id
-    private String id;
+    private ObjectId id;
 
     private ObjectId friend1;
     
@@ -21,11 +21,11 @@ public class friendChatServer {
         this.friend2 = friend2;
     }
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 

@@ -1,8 +1,13 @@
 import './App.css'
 import { Link } from 'react-router';
 
+declare var global: any;
+if(typeof global === 'undefined'){
+  (window as any).global = window;
+}
+
 function LandingPage() {
-  
+
   return(
     <>
       <div id="main-page-container">

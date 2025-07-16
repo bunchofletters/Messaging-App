@@ -41,6 +41,13 @@ public class FilterFrontend implements Filter{
                 return;
             }
 
+            //for stomp websocket: stomp may not have websocket since it's "http://..."
+            if(req.getRequestURI().startsWith("/ws/")){
+                chain.doFilter(request, response);
+                System.out.println("pass");
+                return;
+            }
+
             //Prevents request that doesn't have the require header. Good for Authorization
             String frontEndHeader = req.getHeader(REQUIRE_HEADER);
             if (frontEndHeader == null || !frontEndHeader.equals(HEADER_VALUE)) {

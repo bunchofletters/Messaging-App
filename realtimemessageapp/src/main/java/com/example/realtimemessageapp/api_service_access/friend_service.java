@@ -13,6 +13,7 @@ import com.example.realtimemessageapp.CRUD.accountHandling;
 import com.example.realtimemessageapp.CRUD.chatServerHandling;
 import com.example.realtimemessageapp.CRUD.friendHandling;
 import com.example.realtimemessageapp.CRUD.friendRelationHandling;
+import com.example.realtimemessageapp.DTO.friendListDTO;
 import com.example.realtimemessageapp.DTO.friendRequestDTO;
 import com.example.realtimemessageapp.database_scheme.friendChatServer;
 import com.example.realtimemessageapp.database_scheme.friend_info;
@@ -218,24 +219,26 @@ public class friend_service {
      * @return either 500 error or 200 ok with the friend list
      */
     @PostMapping("/getFriend")
-    public ResponseEntity<List<friendRequestDTO>> getFriends(
+    public ResponseEntity<List<friendListDTO>> getFriends(
         HttpServletRequest request
     ){
         String id = c_s.getId(request); //id of the user
         try{
             List<friend_relation> data = relationshiphandler.findByFriendIdOrUserId(new ObjectId(id), new ObjectId(id));
-            List<friendRequestDTO> friendRelation = data.stream()
+            List<friendListDTO> friendRelation = data.stream()
                 .map(info -> {
                     String first = info.getUserId().toString();
                     String second = info.getFriendId().toString();
-
+                    friendChatServer room = chatserverhandler.findByFriend1AndFriend2(new ObjectId(first), new ObjectId(second));
                     //if the first is the user id we do not need to do a look up. if the second is we do need a look up
                     if (first == id){
-                        return new friendRequestDTO(second, info.getFriendDisplayName());
+                        System.out.println(room.getId());
+                        return new friendListDTO(second, info.getFriendDisplayName(), room.getId().toString());
                     }
                     else{
+                        System.out.println(room.getId());
                         user_info friend_info = accountHander.findById(new ObjectId(first));
-                        return new friendRequestDTO(first, friend_info.getDsiplayName());
+                        return new friendListDTO(first, friend_info.getDsiplayName(), room.getId().toString());
                     }
                 }).collect(Collectors.toList());
             
