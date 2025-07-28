@@ -43,6 +43,7 @@ function OverViewTextRoom() {
     const stompclient = useRef<Client | null>(null);
     const currentroom = useRef<any>(null);
     const [roomMessage, setRoomMessage] = useState<Map<string, MessageContent[]>>(new Map());
+    const [messageCounter, setMessageCounter] = useState(0);
     const [messToSend, setMessToSend] = useState('');
 
 
@@ -75,7 +76,7 @@ function OverViewTextRoom() {
                 const rM = new Map(prevroomMessage); //create a copy of the map
                 const prevMess = rM.get(roomId) || []; // get the content related to teh room
                 rM.set(roomId, [...prevMess, incomingMessage]); //copy old and add new
-
+                setMessageCounter(rM.get(roomId)?.length || 0); // update for message order <can be used as an identifier>
                 return rM; //return the updated map
             });
             console.log("updating message");
@@ -90,11 +91,59 @@ function OverViewTextRoom() {
                 destination: `/chat/send`,
                 body: JSON.stringify({roomId, messToSend})
             });
-            setMessToSend('');
         }
+
+        setRoomMessage(prev => {
+            const updateMessage = new Map(prev);
+            const currentMessage = updateMessage.get(roomId) || [];
+            const formatMessage: MessageContent = {displayName: dName, content: messToSend, side: '0', order: messageCounter};
+            currentMessage.push(formatMessage);
+            updateMessage.set(roomId, [...currentMessage]);
+            setMessageCounter(updateMessage.get(roomId)?.length || 0); //update for order so the server knows
+            return updateMessage;
+        });
+
+        console.log(roomMessage.get(roomId))
     };
 
 // end of web socket stuff
+    const [dName, setDName] = useState('');
+    //Make a call to get the user displayname at session start
+    useEffect(() => {
+        const getName = async () => {
+            const response = await fetch('http://localhost:3000/account/getUserName', {
+                method: "GET",
+                headers: {
+                    "FE_XP": "react-frontend"
+                },
+                credentials: 'include'
+            });
+            
+            if(response.ok){
+                const name = await response.text();
+                setDName(name);              
+            } else {
+                console.error("issue getting name")
+                return false;
+            }
+
+        };
+
+        getName();
+        
+    }, [])
+
+
+
+    const submit = async (e: React.KeyboardEvent) => {
+        if(e.key === 'Enter'){
+            console.log(roomId)
+            //Make a fetch to the server and save the message
+            console.log(messToSend);
+            sendMessage()
+            setMessToSend('');
+        }
+    } 
 
     return (
         <>
@@ -151,7 +200,14 @@ function OverViewTextRoom() {
                     </div>
                 </div>
                 <div className="relative flex justify-center">
-                    <input className="border-2 w-[99%] rounded items-center mb-2 p-3 dark:bg-[#242424] not-dark:bg-[#A7C7E7] not-dark:border-[#242424]">
+                    <input 
+                        className="border-2 w-[99%] rounded items-center mb-2 p-3 dark:bg-[#242424] not-dark:bg-[#A7C7E7] not-dark:border-[#242424]" 
+                        onChange={(e) => {setMessToSend(e.target.value)}}
+                        onKeyUp={(e) => {
+                            submit(e);
+                        }}
+                        value={messToSend}
+                    >
                     </input>
                 </div>
             </div>

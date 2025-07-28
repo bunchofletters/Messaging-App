@@ -7,11 +7,13 @@ import com.example.realtimemessageapp.DTO.userDTO;
 import com.example.realtimemessageapp.database_scheme.user_info;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +33,9 @@ public class account_service {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private cookie_service cookieHandler;
 
     // public account_service(accountHandling accountHandler){
     //     this.accountHandler = accountHandler;
@@ -105,4 +110,25 @@ public class account_service {
         response.addCookie(cookie);
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * takes a userid that is stored in the cookie and returns the displayname assossiated with that id
+     * @param cookie user's id
+     * @return the displayname of the user
+     */
+    @GetMapping("/getUserName")
+    public ResponseEntity<String> getusername(HttpServletRequest cookie) {
+        try {
+            String id = cookieHandler.getId(cookie);
+            user_info user = accountHandler.findById(new ObjectId(id));
+            String returnUser = user.getDsiplayName();
+            
+            return ResponseEntity.ok(returnUser);
+        } catch(Exception e){
+            System.out.println(e);
+            return ResponseEntity.status(500).build();
+        }
+        
+    }
+    
 }
