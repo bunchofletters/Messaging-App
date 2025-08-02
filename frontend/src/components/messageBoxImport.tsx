@@ -22,7 +22,7 @@ const RightMessageBox: React.FC<Messages> = ({messages}) => {
         {/* use a for and make a new message box for each message */}
         {messages.length > 0 ? 
             ( 
-                <div className="overflow-auto" ref={containerRef}>
+                <div ref={containerRef}>
                     {messages.map((messages) => (
                         <MessageBox
                             key={messages.order}

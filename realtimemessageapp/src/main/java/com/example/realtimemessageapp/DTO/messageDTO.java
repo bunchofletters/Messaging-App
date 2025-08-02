@@ -3,7 +3,7 @@ package com.example.realtimemessageapp.DTO;
 public class messageDTO {
     
     private String messageContent;
-    private boolean fromUser; //true if the message is from the user false otherwise
+    private String fromUser; //true if the message is from the user false otherwise [enforce that fromuser is either a 0 or 1]:: 0 = fromUser or 1 = fromFriend.
 
     public messageDTO() {}
 
@@ -15,11 +15,11 @@ public class messageDTO {
         this.messageContent = messageContent;
     }
 
-    public boolean isFromUser() {
+    public String isFromUser() {
         return fromUser;
     }
 
-    public void setFromUser(boolean fromUser) {
+    public void setFromUser(String fromUser) {
         this.fromUser = fromUser;
     }
 

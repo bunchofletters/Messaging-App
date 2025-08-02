@@ -103,15 +103,38 @@ function OverViewTextRoom() {
             return updateMessage;
         });
 
-        console.log(roomMessage.get(roomId))
+        // console.log(roomMessage.get(roomId))
     };
 
 // end of web socket stuff
+
+    async function saveMessage(message: string, order: number, server: string) {
+        const response = await fetch('http://localhost:8080/message/saveMessage', {
+            method: "POST",
+            headers: {
+                "FE_XP": "react-frontend",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: message,
+                order: order,
+                server: server
+            }),
+            credentials: 'include'
+        });
+
+        if (!response.ok){
+            console.error("error saving message to server");
+            return 1;
+        }
+        return 0;
+    }
+
     const [dName, setDName] = useState('');
     //Make a call to get the user displayname at session start
     useEffect(() => {
         const getName = async () => {
-            const response = await fetch('http://localhost:3000/account/getUserName', {
+            const response = await fetch('http://localhost:8080/account/getUserName', {
                 method: "GET",
                 headers: {
                     "FE_XP": "react-frontend"
@@ -137,10 +160,18 @@ function OverViewTextRoom() {
 
     const submit = async (e: React.KeyboardEvent) => {
         if(e.key === 'Enter'){
-            console.log(roomId)
             //Make a fetch to the server and save the message
-            console.log(messToSend);
-            sendMessage()
+            try{
+                if(messToSend !== null && messToSend !== ""){ //trying to not allow sending of empty messages
+                    const result = await saveMessage(messToSend, messageCounter, roomId);
+                    if (result === 1) {
+                        throw Error("issue with saving message");
+                    }
+                    sendMessage();
+                }
+            } catch (err){
+                console.error("either saveMessage or sendMessage failed to run: ", err)
+            }
             setMessToSend('');
         }
     } 
@@ -194,7 +225,7 @@ function OverViewTextRoom() {
                 </div>
             </div>
             <div className="flex flex-col flex-2/3 dark:bg-gray-800 not-dark:bg-blue-200">
-                <div className="flex-3/4">
+                <div className="flex-3/4 overflow-auto">
                     <div className= "mt-5 ml-2">
                         <RightMessageBox messages={roomMessage.get(roomId) || []}/>
                     </div>

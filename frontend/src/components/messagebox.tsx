@@ -16,6 +16,7 @@ const MessageBox: React.FC<MessageContent> = ({displayName, content, side}) => {
             </div>
             <div> {/*message content div */}
                 <p>{content}</p>
+                
             </div>
         </div>
         </>
