@@ -11,6 +11,7 @@ import SockJS from 'sockjs-client';
 function OverViewTextRoom() {
     const [friendRequest, setFriendRequest] = useState(false);
     const [message, setMessage] = useState(true);
+    const [friendRequestUpdate, setFriendRequestUpdate] = useState(0);
 
     const [overflow, setOverFlow] = useState('auto')
 
@@ -33,6 +34,7 @@ function OverViewTextRoom() {
                 break;
             case 1:
                 setFriendRequest(true);
+                setFriendRequestUpdate(friendRequestUpdate+1);
                 break;
             default:
                 break;
@@ -64,49 +66,99 @@ function OverViewTextRoom() {
         stompclient.current.activate();
     }
 
-    const switchRoom = (roomId: string) => {
+    const switchRoom = async (roomId: string) => {
         if(currentroom.current){
             currentroom.current.unsubscribe();
-            console.log("unsubscribing from room");
+        }
+
+        //Pre-Fetch the message
+        if(roomMessage.has(roomId) === false){
+            const prevMessage: MessageContent[]  = await getMessage();
+            //set up prev message by the order provided
+            
+            const MC: MessageContent[] = prevMessage.map(content => ({
+                content: content.content,
+                side: content.side,
+                displayName: content.displayName,
+                order: content.order
+            }));
+            const rM = new Map<string, MessageContent[]>();
+            MC.forEach((message) => {
+                const prevMessage = rM.get(roomId) || [];
+                prevMessage.push(message);
+                rM.set(roomId, prevMessage);
+            });
+            setRoomMessage(rM);
         }
 
         currentroom.current = stompclient.current?.subscribe(`/chat/${roomId}`, (messageOutput: any) => {
-            const incomingMessage = messageOutput.body;
+
+
+            const incomingMessage = JSON.parse(messageOutput.body);
+            const incomingMessageUpdate: MessageContent = {
+                content: incomingMessage.message,
+                side: incomingMessage.side,
+                displayName: incomingMessage.dName,
+                order: incomingMessage.order
+            };
+
             setRoomMessage((prevroomMessage) => {
                 const rM = new Map(prevroomMessage); //create a copy of the map
                 const prevMess = rM.get(roomId) || []; // get the content related to teh room
-                rM.set(roomId, [...prevMess, incomingMessage]); //copy old and add new
+                rM.set(roomId, [...prevMess, incomingMessageUpdate]); //copy old and add new
                 setMessageCounter(rM.get(roomId)?.length || 0); // update for message order <can be used as an identifier>
-                return rM; //return the updated map
+                return new Map(rM); //return the updated map
             });
-            console.log("updating message");
         })
-
         setRoomId(roomId);
     }
 
     const sendMessage = () => {
         if(messToSend && roomId && stompclient.current?.connected) {
             stompclient.current?.publish({
-                destination: `/chat/send`,
-                body: JSON.stringify({roomId, messToSend})
+                destination: `/app/chat/send`,
+                body: JSON.stringify({
+                    "room": roomId, 
+                    "message": messToSend,
+                    "displayName": dName,
+                    "order": messageCounter,
+                    "side": "1",
+                })
             });
         }
 
-        setRoomMessage(prev => {
-            const updateMessage = new Map(prev);
-            const currentMessage = updateMessage.get(roomId) || [];
-            const formatMessage: MessageContent = {displayName: dName, content: messToSend, side: '0', order: messageCounter};
-            currentMessage.push(formatMessage);
-            updateMessage.set(roomId, [...currentMessage]);
-            setMessageCounter(updateMessage.get(roomId)?.length || 0); //update for order so the server knows
-            return updateMessage;
-        });
+        // setRoomMessage(prev => {
+        //     const updateMessage = new Map(prev);
+        //     const currentMessage = updateMessage.get(roomId) || [];
+        //     const formatMessage: MessageContent = {displayName: dName, content: messToSend, side: '0', order: messageCounter};
+        //     currentMessage.push(formatMessage);
+        //     updateMessage.set(roomId, [...currentMessage]);
+        //     setMessageCounter(updateMessage.get(roomId)?.length || 0); //update for order so the server knows
+        //     return updateMessage;
+        // });
 
         // console.log(roomMessage.get(roomId))
     };
 
 // end of web socket stuff
+
+    async function getMessage(){
+        const response = await fetch('http://localhost:8080/message/retreiveMessage', {
+            method: "POST",
+            headers: {
+                "FE_XP": "react-frontend",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({"server": roomId}),
+            credentials: 'include'
+        });
+
+        if(!response.ok){
+            return null;
+        }
+
+        return response.json();
+    }
 
     async function saveMessage(message: string, order: number, server: string) {
         const response = await fetch('http://localhost:8080/message/saveMessage', {
@@ -209,7 +261,7 @@ function OverViewTextRoom() {
                         onTransitionStart={()=>setOverFlow('hidden')}
                         onTransitionEnd={()=>setOverFlow('auto')}
                     >
-                        <FriendRequest key={Date.now()}/>
+                        <FriendRequest key={friendRequestUpdate}/>
                     </div>
                     <div 
                         className={`absolute top-0 left-0 w-full h-full transition-all duration-1000 ease-in-out dark:bg-gray-900 not-dark:bg-[#bdd8f3] ${message ? 'max-h-[94.6%] translate-y-0 visible': `h-0 translate-y-[-100%] invisible`}`}
@@ -227,7 +279,7 @@ function OverViewTextRoom() {
             <div className="flex flex-col flex-2/3 dark:bg-gray-800 not-dark:bg-blue-200">
                 <div className="flex-3/4 overflow-auto">
                     <div className= "mt-5 ml-2">
-                        <RightMessageBox messages={roomMessage.get(roomId) || []}/>
+                        <RightMessageBox messages={roomMessage.get(roomId) || []} />
                     </div>
                 </div>
                 <div className="relative flex justify-center">

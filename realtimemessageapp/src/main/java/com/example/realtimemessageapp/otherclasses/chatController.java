@@ -4,6 +4,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import com.example.realtimemessageapp.DTO.chatDTO;
+
 @Controller
 public class chatController {
     
@@ -14,7 +16,8 @@ public class chatController {
     }
 
     @MessageMapping("/chat/send")
-    public void sendMessage(String roomId, String message){
-        this.message.convertAndSend("/chat/" + roomId, message);
+    public void sendMessage(chatDTO cDTO){
+        String roomId = cDTO.getRoom();
+        this.message.convertAndSend("/chat/" + roomId, cDTO);
     }
 }

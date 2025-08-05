@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useRef} from "react";
 
 import MessageBox from "./messagebox";
 import type { MessageContent } from "./messagebox";
